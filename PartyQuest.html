@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#07070b">
+<title>Party Quest</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;background:#000;color:#f8f3ff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+button{font:inherit}
+#app{width:min(100vw,430px);height:100dvh;min-height:620px;margin:auto;position:relative;overflow:hidden;background:radial-gradient(circle at 50% -10%,#44204f,#110d18 38%,#050508 82%)}
+.screen{position:absolute;inset:0;padding:max(18px,env(safe-area-inset-top)) 16px max(15px,env(safe-area-inset-bottom));overflow:auto;display:none}
+.screen.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.logo{text-align:center;margin-top:14vh}.logo .icon{font-size:64px;filter:drop-shadow(0 0 18px #ff3158)}
+h1{font-size:44px;line-height:.9;letter-spacing:-3px;margin:8px 0;text-shadow:0 4px #000;font-weight:1000}h1 span{color:#ff3158}
+h2{font-size:25px;margin:7px 0 15px}.sub,.muted{color:#aaa4b7}
+.btn{display:block;width:100%;padding:15px;margin:7px 0;border-radius:16px;border:1px solid #40384c;color:#fff;background:linear-gradient(#24202f,#11111a);font-weight:850;box-shadow:0 7px 20px #0008}
+.btn.primary{background:linear-gradient(135deg,#ff3158,#862cff);border-color:#ff6681}
+.btn:active{transform:scale(.985)}.btn:disabled{opacity:.4}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.pill{background:#171522e8;border:1px solid #40384c;padding:8px 11px;border-radius:999px;font-size:12px;font-weight:850}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:linear-gradient(145deg,#201b2b,#0d0c13);border:1px solid #40384c;border-radius:18px;padding:9px;text-align:center}
+.card.sel{border:2px solid #ff3158;box-shadow:0 0 20px #ff315833}.avatar{height:100px;border-radius:13px;background:radial-gradient(circle,#3b2648,#11111a);display:flex;align-items:center;justify-content:center;font-size:58px}.name{font-weight:950;margin-top:7px}.ability{font-size:11px;color:#c8c0d0;min-height:29px;margin-top:3px}
+.banner{background:#11111acc;border:1px solid #302a3b;border-radius:15px;padding:11px;margin:11px 0;font-size:12px;color:#c7bfd3}
+.board{height:285px;border-radius:22px;border:1px solid #4a4057;position:relative;overflow:hidden;background:radial-gradient(circle at 75% 25%,#5d1d5d,transparent 24%),linear-gradient(145deg,#1c1729,#07070a)}
+.board:after{content:"";position:absolute;inset:13px;border:2px dashed #75384f;border-radius:20px;transform:rotate(-2deg);opacity:.75}
+.node{position:absolute;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2;font-size:11px;font-weight:900;background:#171725;border:2px solid #777;box-shadow:0 3px 7px #0008}.node.star{color:#ffd34d;border-color:#ffd34d;background:#39280d}.node.trap{color:#ff3158;border-color:#ff3158;background:#3c0f1c}
+.player{position:absolute;width:42px;height:42px;z-index:4;display:flex;align-items:center;justify-content:center;font-size:27px;filter:drop-shadow(0 4px 5px #000);transition:.35s}
+.status{background:#11111adf;border:1px solid #332d3e;border-radius:15px;padding:12px;margin-top:9px;min-height:48px;font-size:13px;color:#d6cedf}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mini{background:linear-gradient(145deg,#21172d,#0c0b11);border:1px solid #40334e;border-radius:20px;padding:17px;text-align:center}.score{font-size:44px;font-weight:1000}.target{width:145px;height:145px;border-radius:50%;display:block;margin:16px auto;background:radial-gradient(circle,#fff 0 8%,#ff3158 9% 22%,#15111d 23% 40%,#9b5cff 41% 58%,#08070c 59%);border:5px solid #33263f}.target:active{transform:scale(.94)}
+.toast{position:absolute;z-index:20;left:16px;right:16px;bottom:25px;background:#0d0b13f5;border:1px solid #59495f;border-radius:14px;padding:12px;text-align:center;transform:translateY(150%);transition:.2s;font-size:13px}.toast.show{transform:none}
+</style>
+</head>
+<body>
+<div id="app">
+<section id="home" class="screen on">
+ <div class="logo"><div class="icon">☠️</div><h1>PARTY<br><span>QUEST</span></h1><div class="sub">Gothic party chaos • 1–4 players</div></div>
+ <button class="btn primary" onclick="go('chars')">▶ PLAY</button>
+ <button class="btn" onclick="go('maps')">🗺 MAPS</button>
+ <button class="btn" onclick="go('mini','home')">🎮 MINI-GAME</button>
+</section>
+
+<section id="chars" class="screen">
+ <div class="top"><button class="pill" onclick="go('home')">‹ Back</button><div class="pill">Champion</div></div>
+ <h2>Choose your champion</h2><div class="grid" id="chars"></div>
+ <div class="banner">Each champion has a passive ability that can change your luck.</div>
+ <button class="btn primary" onclick="go('maps')">CONTINUE →</button>
+</section>
+
+<section id="maps" class="screen">
+ <div class="top"><button class="pill" onclick="go('home')">‹ Back</button><div class="pill">Map</div></div>
+ <h2>Choose your nightmare</h2><div class="grid" id="maps"></div>
+ <button class="btn primary" onclick="startGame()">START PARTY</button>
+</section>
+
+<section id="game" class="screen">
+ <div class="top"><div class="pill">TURN <b id="turn">1</b>/10</div><div class="pill">⭐ <b id="stars">0</b> &nbsp; 🪙 <b id="coins">10</b></div></div>
+ <div class="board" id="board"></div>
+ <div class="status" id="status">Roll the cursed die.</div>
+ <div class="twocol"><button class="btn primary" id="roll" onclick="roll()">🎲 ROLL</button><button class="btn" onclick="item()">🎒 ITEM</button></div>
+ <button class="btn" onclick="openMini()">🎮 MINI-GAME</button>
+</section>
+
+<section id="mini" class="screen">
+ <div class="top"><button class="pill" onclick="backMini()">‹ Back</button><div class="pill">Skull Rush</div></div>
+ <div class="mini"><h2>💀 Skull Rush</h2><div class="muted">Tap 12 times before 10 seconds ends.</div><div class="score" id="ms">0</div><button class="target" onclick="tap()" aria-label="Tap skull"></button><div class="muted" id="time">10 seconds</div><button class="btn primary" id="start" onclick="miniStart()">START</button></div>
+</section>
+
+<section id="win" class="screen">
+ <div class="logo" style="margin-top:9vh"><div class="icon">👑</div><h1>PARTY<br><span>CHAMPION</span></h1><div class="sub" id="winner"></div></div>
+ <button class="btn primary" onclick="go('home')">PLAY AGAIN</button>
+</section>
+<div class="toast" id="toast"></div>
+</div>
+<script>
+const C=[
+["Kage","🐰","Shadow Step • dodge traps","trap"],
+["Nyx","🦊","Void Warp • bonus movement","warp"],
+["Blitz","🐲","Fire Dash • +1 movement","dash"],
+["Oma","🐼","Soul Shield • block losses","shield"],
+["Luna","🧙‍♀️","Chaos Spell • random bonus","chaos"],
+["Raven","🐦‍⬛","Lucky Reroll • reroll 1s","reroll"]
+];
+const M=[
+["Shadow Castle","🏰","Haunted halls & shifting paths"],
+["Cursed Carnival","🎪","Traps, games & creepy prizes"],
+["Void Space","🌀","Portals bend the board"],
+["Frozen Graveyard","❄️","Ice slides & ghost shortcuts"],
+["Inferno Island","🌋","Lava changes the route"],
+["Neon Crypt","🌃","Gothic city after midnight"]
+];
+let ci=+localStorage.pqChar||0,mi=+localStorage.pqMap||0,turn=1,coins=10,stars=0,pos=0,back="home",timer=null,miniScore=0;
+
+const $=x=>document.getElementById(x);
+function go(id,b){if(timer){clearInterval(timer);timer=null}back=b||back;document.querySelectorAll(".screen").forEach(x=>x.classList.remove("on"));$(id).classList.add("on")}
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("show"),1700)}
+function render(){
+ $("chars").innerHTML=C.map((x,i)=>`<div class="card ${i===ci?"sel":""}" onclick="pickC(${i})"><div class="avatar">${x[1]}</div><div class="name">${x[0]}</div><div class="ability">${x[2]}</div></div>`).join("");
+ $("maps").innerHTML=M.map((x,i)=>`<div class="card ${i===mi?"sel":""}" onclick="pickM(${i})"><div class="avatar">${x[1]}</div><div class="name">${x[0]}</div><div class="ability">${x[2]}</div></div>`).join("");
+}
+function pickC(i){ci=i;localStorage.pqChar=i;render()}
+function pickM(i){mi=i;localStorage.pqMap=i;render()}
+function startGame(){turn=1;coins=10;stars=0;pos=0;go("game");build();stats();$("status").textContent=`${C[ci][0]} enters ${M[mi][0]}. Roll the cursed die.`}
+function build(){
+ const b=$("board");b.innerHTML="";
+ for(let i=0;i<20;i++){let n=document.createElement("div");n.className="node "+(i%7===0?"star":i%5===0?"trap":"");n.style.left=(7+(i%5)*21)+"%";n.style.top=(11+Math.floor(i/5)*20)+"%";n.textContent=i%7===0?"★":i%5===0?"!":i+1;b.appendChild(n)}
+ let p=document.createElement("div");p.id="player";p.className="player";p.textContent=C[ci][1];b.appendChild(p);place()
+}
+function place(){let p=$("player");if(!p)return;let x=7+(pos%5)*21,y=11+Math.floor(pos/5)*20;p.style.left=`calc(${x}% - 6px)`;p.style.top=`calc(${y}% - 6px)`}
+function stats(){$("turn").textContent=turn;$("coins").textContent=coins;$("stars").textContent=stars}
+function roll(){
+ let btn=$("roll");if(btn.disabled)return;btn.disabled=true;
+ let r=1+Math.floor(Math.random()*6),extra=C[ci][3]==="dash"?1:0;
+ if(C[ci][3]==="reroll"&&r===1){r=1+Math.floor(Math.random()*6);toast("Raven rerolled!")}
+ pos=Math.min(19,pos+r+extra);coins+=3+(r===6?4:0);
+ let t=`🎲 ${r}${extra?" +1":""}! Landed on space ${pos+1}.`;
+ if(pos%7===0){stars++;t+=" ⭐ Star space! +1 Star."}
+ if(pos%5===0){if(C[ci][3]==="trap")t+=" Shadow Step dodged the trap!";else if(C[ci][3]==="shield")t+=" Soul Shield blocked the trap!";else{coins=Math.max(0,coins-3);t+=" 💀 Trap! -3 coins."}}
+ if(C[ci][3]==="chaos"&&Math.random()<.35){coins+=6;t+=" 🔮 Chaos Spell: +6 coins!"}
+ place();stats();$("status").textContent=t;
+ setTimeout(()=>{if(turn>=10)finish();else{turn++;stats();btn.disabled=false}},700)
+}
+function item(){
+ if(coins<8){toast("Need 8 coins.");return}
+ coins-=8;let r=Math.floor(Math.random()*3);
+ if(r===0){coins+=16;toast("🎁 Mystery Box: +8 coins")}
+ if(r===1){stars++;toast("🎁 Mystery Box: +1 Star")}
+ if(r===2){coins+=4;toast("🎁 Mystery Box: +4 coins")}
+ stats()
+}
+function finish(){$("winner").textContent=`${C[ci][0]} • ${stars} ⭐ • ${coins} 🪙 • ${M[mi][0]}`;go("win")}
+function openMini(){back="game";go("mini","game")}
+function backMini(){go(back||"home")}
+function miniStart(){clearInterval(timer);miniScore=0;$("ms").textContent=0;let t=10;$("time").textContent=t+" seconds";$("start").disabled=true;timer=setInterval(()=>{t--;$("time").textContent=t+" seconds";if(t<=0)endMini(false)},1000)}
+function tap(){if(!timer)return;miniScore++;$("ms").textContent=miniScore;if(miniScore>=12)endMini(true)}
+function endMini(win){clearInterval(timer);timer=null;$("start").disabled=false;if(win){coins+=12;stats();$("time").textContent="WIN! +12 coins";toast("💀 Skull Rush cleared!")}else{$("time").textContent="Time's up";toast("Time's up!")}}
+render();
+</script>
+</body>
+</html>
